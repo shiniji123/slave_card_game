@@ -28,9 +28,11 @@
         .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
+        /* Card Styles - Adjusted for opacity fix */
         .card-disabled { filter: grayscale(100%) brightness(0.6); cursor: not-allowed; transform: scale(0.95); opacity: 0.7; }
         .card-playable { cursor: pointer; filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5)); transition: transform 0.2s; }
         .card-playable:hover { transform: translateY(-15px) !important; }
+        /* Selected state moves card up */
         .card-selected { transform: translateY(-25px) scale(1.1) !important; z-index: 50 !important; filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.9)); border-color: #facc15 !important; }
         .card-new { border: 2px solid #34d399 !important; box-shadow: 0 0 15px #34d399; }
 
@@ -55,7 +57,7 @@
             messagingSenderId: "319088373934",
             appId: "1:319088373934:web:18e4191d7621cb88f3fd3f"
         };
-        const appId = 'my-slave-game-v3'; // Bump version to clear old state
+        const appId = 'my-slave-game-v3';
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -124,7 +126,7 @@
                         id: `${rank}-${suit}`, rank, suit, rankIdx: rIdx, suitIdx: sIdx,
                         display: rank, symbol: ['♣','♦','♥','♠'][sIdx],
                         color: (suit==='hearts'||suit==='diamonds') ? 'text-red-500' : 'text-slate-900',
-                        isNew: false // For exchange feedback
+                        isNew: false
                     });
                 });
             });
@@ -172,7 +174,7 @@
                         code, hostId: user.uid, status: 'WAITING',
                         players: [{ id: user.uid, name: playerName, avatar, hand: [], role: null, status: 'ready', isHost: true }],
                         round: 1, currentTurnIdx: 0, centerPile: [], passCount: 0, winners: [], lastTrickOwner: null,
-                        direction: 1, // 1 = clockwise, -1 = counter-clockwise
+                        direction: 1,
                         exchangeData: null, KingDownAlert: false,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
@@ -210,16 +212,13 @@
                         const myIdx = d.players.findIndex(p=>p.id===user.uid);
                         if(d.status==='PLAYING' && d.currentTurnIdx===myIdx && !procRef.current) audio.playTurn();
 
-                        // Check King Down Alert Sound (Trigger once locally if state changed to KingDown)
                         if(d.KingDownAlert && !procRef.currentKingDown) {
                             audio.playKingDown();
                             procRef.currentKingDown = true;
                         }
                         if(!d.KingDownAlert) procRef.currentKingDown = false;
 
-                        // Auto End Round Check (Only Host triggers)
                         const activePlayers = d.players.filter(p => p.status === 'playing' || p.status === 'passed');
-                        // End when 1 or 0 players left (in case of king down leaving 1 active)
                         if(d.status==='PLAYING' && activePlayers.length <= 1 && d.hostId===user.uid) {
                             endRound(doc.id, d);
                         }
@@ -280,7 +279,6 @@
 
                 if(king && slave) {
                     const give = slave.hand.splice(slave.hand.length-2, 2);
-                    // Mark as new for King to see
                     const markedGive = give.map(c => ({...c, isNew: true}));
                     king.hand = sortHand([...king.hand, ...markedGive]);
                     pending.push({ giver: 'KING', receiver: 'SLAVE', count: 2 });
@@ -295,29 +293,14 @@
             };
 
             const endRound = async (rId, data) => {
-                // Determine Ranking
-                // Winners are in order. Losers are whoever is left.
-                // NOTE: If King Down happened, King status is 'king_down'. They are in the players list but not in winners.
-
                 const losers = data.players.filter(p => !data.winners.includes(p.id) && p.status !== 'king_down');
                 const kingDownPlayer = data.players.find(p => p.status === 'king_down');
 
                 let ranks = [...data.winners];
                 ranks.push(...losers.map(p => p.id));
+                if (kingDownPlayer) ranks.push(kingDownPlayer.id);
 
-                // Assign Roles
-                const count = data.players.length; // Total players
-
-                // If King Down occurred, the King is FORCED to be last (SLAVE).
-                // The person who naturally came last moves up one spot?
-                // No, standard rule: King swaps with Slave.
-                // So effectively King is last.
-
-                if (kingDownPlayer) {
-                    // Put King Down player at the very end of ranks
-                    ranks.push(kingDownPlayer.id);
-                }
-
+                const count = data.players.length;
                 const newRoles = {};
                 ranks.forEach((uid, i) => {
                     let r = 'PEOPLE';
@@ -382,17 +365,52 @@
                 } else setPlayableCards(new Set());
             }, [roomData]);
 
-            const clickCard = (c) => {
+            // --- CLICK LOGIC (Auto Select) ---
+            const handleCardClick = (card) => {
                 if(roomData.status==='EXCHANGE') {
                     if(selectedCards.find(s=>s.id===c.id)) setSelectedCards(selectedCards.filter(s=>s.id!==c.id));
                     else setSelectedCards([...selectedCards,c]);
                     return;
                 }
+
+                // Only allow click if it's my turn
                 if(roomData.currentTurnIdx!==roomData.players.findIndex(p=>p.id===user.uid)) return;
-                if(!playableCards.has(c.id)) { audio.playError(); return; }
+
+                // Only allow valid playable cards
+                if(!playableCards.has(card.id)) { audio.playError(); return; }
                 audio.playClick();
-                if(selectedCards.find(s=>s.id===c.id)) setSelectedCards(selectedCards.filter(s=>s.id!==c.id));
-                else setSelectedCards([...selectedCards,c]);
+
+                // AUTO-SELECT LOGIC
+                const pile = roomData.centerPile;
+                const topTrick = (pile.length > 0 && pile[pile.length - 1].playerId !== user.uid) ? pile[pile.length - 1] : null;
+
+                if (topTrick && topTrick.cards.length > 1) {
+                    // If pile needs Pairs/Triples/Quads
+                    const myHand = roomData.players.find(p=>p.id===user.uid).hand;
+                    const sameRankCards = myHand.filter(c => c.rankIdx === card.rankIdx);
+
+                    // Check if we are selecting or deselecting
+                    const isSelected = selectedCards.some(c => c.id === card.id);
+
+                    if (isSelected) {
+                        // Deselect all of this rank
+                        setSelectedCards(selectedCards.filter(c => c.rankIdx !== card.rankIdx));
+                    } else {
+                        // Select all of this rank (add to existing selection, though usually you pick one set)
+                        // Smart logic: Clear other ranks first because you can only play one rank at a time
+                        const otherRankSelected = selectedCards.filter(c => c.rankIdx !== card.rankIdx);
+                        // Usually clean sweep is better:
+                        // setSelectedCards(sameRankCards);
+
+                        // But let's support multi-touch just in case, sticking to user request "select all of that number"
+                        // I will replace selection with this rank group for convenience
+                        setSelectedCards(sameRankCards);
+                    }
+                } else {
+                    // Standard Single Toggle
+                    if(selectedCards.find(s=>s.id===card.id)) setSelectedCards(selectedCards.filter(s=>s.id!==card.id));
+                    else setSelectedCards([...selectedCards, card]);
+                }
             };
 
             const submit = async () => {
@@ -406,7 +424,6 @@
                     const me = newP.find(p=>p.id===user.uid);
                     const recv = newP.find(p=>p.role===pending.receiver);
 
-                    // Unmark new cards when returning (cleanup)
                     me.hand = me.hand.map(c => ({...c, isNew: false})).filter(c=>!selectedCards.some(s=>s.id===c.id));
                     recv.hand = sortHand([...recv.hand, ...selectedCards]);
 
@@ -450,29 +467,19 @@
                     finishedNow = true;
                 }
 
-                // --- KING DOWN LOGIC ---
-                // If round > 1, and this is the FIRST winner, and this winner is NOT the King
                 if(roomData.round > 1 && roomData.winners.length === 0 && finishedNow) {
                     const kingPlayer = newPlayers.find(p => p.role === 'KING');
                     if(kingPlayer && kingPlayer.id !== user.uid) {
-                        // King failed to be first!
-                        kingPlayer.status = 'king_down'; // Special status: King is out
-                        // Note: King still has cards, but effectively they stop playing.
+                        kingPlayer.status = 'king_down';
                         updates.KingDownAlert = true;
                     }
                 }
 
-                // Next Turn Logic
                 let next = (roomData.currentTurnIdx + roomData.direction + newPlayers.length) % newPlayers.length;
                 let loop = 0;
                 while(loop < newPlayers.length) {
                     const p = newPlayers[next];
-                    if(p.hand.length > 0 && p.status === 'playing') break; // Only playing, not passed or finished/king_down
-                    // Also allow if they haven't passed? 'playing' covers it.
-                    // Wait, initial status is 'ready', changed to 'playing' on start.
-                    // Statuses: 'playing', 'passed', 'finished', 'king_down'
                     if(p.hand.length > 0 && p.status !== 'passed' && p.status !== 'king_down' && p.status !== 'finished') break;
-
                     next = (next + roomData.direction + newPlayers.length) % newPlayers.length;
                     loop++;
                 }
@@ -488,7 +495,6 @@
                 newP[myIdx].lastAction = 'PASS'; newP[myIdx].status = 'passed';
                 audio.playClick();
 
-                // Find next
                 let dir = roomData.direction;
                 let next = (roomData.currentTurnIdx + dir + newP.length) % newP.length;
                 let loop=0; let found=false;
@@ -500,17 +506,14 @@
                 }
 
                 if(!found) {
-                    // CLEAR TRICK
                     const owner = newP.find(p=>p.id===roomData.lastTrickOwner);
                     let start = newP.findIndex(p=>p.id===roomData.lastTrickOwner);
 
-                    // REVERSE LOGIC: If owner finished, reverse direction
                     let newDirection = dir;
                     if(owner && owner.status === 'finished') {
-                        newDirection = dir * -1; // Flip
+                        newDirection = dir * -1;
                     }
 
-                    // Find next start based on possibly new direction
                     if(owner.status === 'finished' || owner.status === 'king_down') {
                         start = (start + newDirection + newP.length) % newP.length;
                         let l=0;
@@ -522,7 +525,6 @@
                         }
                     }
 
-                    // Reset Statuses
                     const resetP = newP.map(p => ({...p, status: (p.status==='finished'||p.status==='king_down') ? p.status : 'playing', lastAction:null}));
                     await updateRoom({ players: resetP, centerPile: [], passCount: 0, currentTurnIdx: start, direction: newDirection });
                 } else {
@@ -530,16 +532,10 @@
                 }
             };
 
-            // Auto Clear Visual Effect
             useEffect(() => {
                 if(roomData && roomData.status==='PLAYING' && roomData.centerPile.length>0) {
                     const curr = roomData.players[roomData.currentTurnIdx];
                     if(curr.id===roomData.lastTrickOwner && curr.id===user.uid) {
-                        // Winner clears trick logic (auto for UI)
-                        // If I am the owner, I can play.
-                        // But wait, if I am finished (won), I wouldn't be currentTurnIdx unless logic failed.
-                        // Logic in 'pass' handles moving turn away from finished owner.
-                        // This block handles if I am still playing and it looped back to me.
                         const resetP = roomData.players.map(p => ({...p, status: (p.status==='finished'||p.status==='king_down') ? p.status : 'playing', lastAction:null}));
                         updateRoom({ centerPile: [], passCount: 0, players: resetP });
                     }
@@ -586,7 +582,6 @@
             const me = roomData.players[myIdx];
             const isTurn = roomData.status==='PLAYING' && roomData.currentTurnIdx===myIdx;
 
-            // --- SUMMARY SCREEN ---
             if(roomData.status === 'SUMMARY') {
                 const sortedPlayers = [...roomData.players].sort((a,b) => {
                     const ra = roomData.winners.indexOf(a.id);
@@ -630,7 +625,6 @@
                 );
             }
 
-            // --- EXCHANGE SCREEN ---
             if(roomData.status === 'EXCHANGE') {
                 const pending = roomData.exchangeData.pendingReturns.find(p=>p.giver===me.role);
                 return (
@@ -655,7 +649,7 @@
                                     <p className="text-xl mb-6">คุณคือ <span className={`font-bold ${ROLES[me.role].text}`}>{me.role}</span> กรุณาเลือกไพ่ <span className="text-white font-bold underline">{pending.count} ใบ</span> เพื่อคืนให้ {pending.receiver}</p>
                                     <div className="flex justify-center gap-2 mb-8 flex-wrap">
                                         {me.hand.map(c => (
-                                            <div key={c.id} onClick={()=>clickCard(c)} className={`w-20 h-28 bg-white rounded border-2 flex flex-col items-center justify-center cursor-pointer transition ${selectedCards.find(s=>s.id===c.id)?'border-yellow-400 -translate-y-4 shadow-[0_0_15px_gold]':'border-gray-300 hover:-translate-y-2'} ${c.isNew ? 'card-new' : ''}`}>
+                                            <div key={c.id} onClick={()=>handleCardClick(c)} className={`w-20 h-28 bg-white rounded border-2 flex flex-col items-center justify-center cursor-pointer transition ${selectedCards.find(s=>s.id===c.id)?'border-yellow-400 -translate-y-4 shadow-[0_0_15px_gold]':'border-gray-300 hover:-translate-y-2'} ${c.isNew ? 'card-new' : ''}`}>
                                                 <span className={`text-2xl ${c.color}`}>{c.symbol}</span>
                                                 <span className={`font-bold ${c.color}`}>{c.display}</span>
                                             </div>
@@ -670,10 +664,8 @@
                 );
             }
 
-            // --- PLAYING SCREEN ---
             return (
                 <div className="min-h-screen bg-[#1a4731] relative overflow-hidden select-none flex flex-col">
-                    {/* Header */}
                     <div className="absolute top-0 w-full p-4 flex justify-between z-20">
                         <div className="glass-panel px-4 py-2 rounded-lg flex gap-2"><span className="text-gray-400">ROOM</span><span onClick={()=>{navigator.clipboard.writeText(roomData.code);alert("Copied")}} className="font-mono font-bold text-yellow-400 cursor-pointer">{roomData.code}</span></div>
                         <div className="flex gap-2">
@@ -682,7 +674,6 @@
                         </div>
                     </div>
 
-                    {/* Waiting Room Overlay */}
                     {roomData.status==='WAITING' && (
                         <div className="absolute inset-0 bg-black/85 z-50 flex flex-col items-center justify-center backdrop-blur-sm">
                             <div className="mb-8 text-center" onClick={()=>{navigator.clipboard.writeText(roomData.code);alert("Copied")}}>
@@ -702,7 +693,6 @@
                         </div>
                     )}
 
-                    {/* Table Area */}
                     <div className="flex-1 relative flex items-center justify-center pb-32">
                         {roomData.KingDownAlert && <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-red-600 text-white px-6 py-1 rounded-full text-sm font-bold animate-pulse shadow-lg z-10 whitespace-nowrap">👑 KING DOWN EFFECT ACTIVE</div>}
 
@@ -721,12 +711,11 @@
                             )}
                         </div>
 
-                        {/* Opponents */}
                         {roomData.players.filter(p=>p.id!==user.uid).map((p,i,arr)=>{
                             const deg = (180 / (arr.length+1)) * (i+1);
                             const rad = deg * (Math.PI/180);
                             const x = 50 - 40 * Math.cos(rad);
-                            const y = 30 - 25 * Math.sin(rad); // Compact vertical
+                            const y = 30 - 25 * Math.sin(rad);
                             const active = roomData.players[roomData.currentTurnIdx].id===p.id;
 
                             return (
@@ -744,7 +733,6 @@
                         })}
                     </div>
 
-                    {/* My Area */}
                     <div className="w-full flex flex-col items-center bg-gradient-to-t from-black/90 to-transparent pt-4 pb-4 sm:pt-12 relative z-30">
                         {isTurn && (
                             <div className="absolute -top-12 sm:-top-16 flex gap-4 animate-float">
@@ -755,16 +743,18 @@
                         {(me.status==='passed' || me.status==='king_down') && <div className="absolute -top-10 text-red-500 font-bold text-2xl animate-pulse tracking-widest drop-shadow-lg">{me.status==='king_down'?'KING DOWN':'คุณผ่าน'}</div>}
 
                         {/* Hand Cards - Improved Scrolling for Mobile */}
-                        <div className="hand-container flex -space-x-4 sm:-space-x-6 hover:space-x-0 transition-all duration-300 h-36 sm:h-40 items-end px-8 overflow-x-auto w-full justify-start sm:justify-center">
+                        <div className="hand-container flex -space-x-4 sm:-space-x-6 hover:space-x-0 transition-all duration-300 h-36 sm:h-40 items-end px-12 overflow-x-auto w-full justify-start sm:justify-center">
+                            {/* Start Spacer */}
+                            <div className="min-w-[1rem] sm:min-w-0"></div>
                             {me.hand.map((c,i)=>(
-                                <div key={c.id} onClick={()=>clickCard(c)} className={`relative min-w-[5rem] w-20 h-28 sm:w-24 sm:h-36 bg-white rounded-xl border border-gray-300 shadow-2xl flex flex-col items-center justify-between p-2 flex-shrink-0 transition-all duration-200 ${selectedCards.find(s=>s.id===c.id)?'card-selected':''} ${isTurn&&!playableCards.has(c.id)?'card-disabled':'card-playable'} ${!isTurn?'opacity-80':''} ${c.isNew?'card-new':''}`} style={{zIndex: selectedCards.find(s=>s.id===c.id)?50:i}}>
+                                <div key={c.id} onClick={()=>handleCardClick(c)} className={`relative min-w-[5rem] w-20 h-28 sm:w-24 sm:h-36 bg-white rounded-xl border border-gray-300 shadow-2xl flex flex-col items-center justify-between p-2 flex-shrink-0 transition-all duration-200 ${selectedCards.find(s=>s.id===c.id)?'card-selected':''} ${isTurn&&!playableCards.has(c.id)?'card-disabled':'card-playable'} ${c.isNew?'card-new':''}`} style={{zIndex: selectedCards.find(s=>s.id===c.id)?50:i}}>
                                     <div className="w-full flex justify-between leading-none"><span className={`text-lg font-bold ${c.color}`}>{c.display}</span><span className={`text-lg ${c.color}`}>{c.symbol}</span></div>
                                     <div className={`text-4xl sm:text-5xl ${c.color}`}>{c.symbol}</div>
                                     <div className="w-full flex justify-end leading-none rotate-180"><span className={`text-lg font-bold ${c.color}`}>{c.display}</span></div>
                                 </div>
                             ))}
-                            {/* Spacer for scrolling to last card */}
-                            <div className="min-w-[2rem]"></div>
+                            {/* End Spacer */}
+                            <div className="min-w-[4rem] sm:min-w-0"></div>
                         </div>
                         <div className="flex items-center gap-4 mt-1 bg-white/10 px-4 py-1 sm:px-6 sm:py-2 rounded-full border border-white/10 mb-2">
                             <div className="text-3xl sm:text-4xl">{me.avatar}</div>
