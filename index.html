@@ -177,6 +177,13 @@
                 audioManager.updateVolume();
             }, [volume, isSoundOn]);
 
+            const resetIdentity = async () => {
+                if (confirm("ต้องการรีเซ็ตตัวตนเพื่อเล่นเป็นผู้เล่นใหม่ใช่ไหม? (ใช้แก้ปัญหาเมื่อทดสอบเล่นคนเดียว)")) {
+                    await auth.signOut();
+                    window.location.reload();
+                }
+            };
+
             // --- LOBBY ACTIONS ---
             const createRoom = async () => {
                 if (!user || !playerName.trim()) return alert("กรุณาใส่ชื่อเล่น");
@@ -219,7 +226,14 @@
                     if (!alreadyIn) {
                         const updatedPlayers = [...room.players, { id: user.uid, name: playerName, avatar, hand: [], role: null, status: 'ready', isHost: false }];
                         await roomsRef.doc(roomDoc.id).update({ players: updatedPlayers });
+                    } else {
+                        // UPDATE EXISTING PLAYER INFO (Fix for re-joining on same device)
+                        const updatedPlayers = room.players.map(p =>
+                            p.id === user.uid ? { ...p, name: playerName, avatar: avatar } : p
+                        );
+                        await roomsRef.doc(roomDoc.id).update({ players: updatedPlayers });
                     }
+
                     joinRoomLogic(roomDoc.id);
                 } catch (e) { alert("Error: " + e.message); setIsLoading(false); }
             };
@@ -646,6 +660,12 @@
                                     {AVATARS.map(a => <button key={a} onClick={()=>setAvatar(a)} className={`text-2xl p-2 rounded-full ${avatar===a ? 'bg-yellow-500' : 'bg-gray-700'}`}>{a}</button>)}
                                 </div>
                                 <button onClick={()=>setView('LOBBY')} disabled={!user} className="w-full bg-yellow-500 text-black font-bold py-3 rounded-lg">{user ? 'ENTER LOBBY' : 'Connecting...'}</button>
+
+                                <div className="flex justify-center mt-2">
+                                    <button onClick={resetIdentity} className="text-gray-500 text-xs underline hover:text-gray-300">
+                                        รีเซ็ตตัวตน (แก้ปัญหาเข้าห้องไม่ได้/เล่นคนเดียว)
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
