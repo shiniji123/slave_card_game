@@ -42,7 +42,6 @@
 
     <script type="text/babel">
         // --- FIREBASE SETUP ---
-
         const firebaseConfig = {
             apiKey: "AIzaSyDkA2oF2pmpVOTVG3fj3D95mkmzia-foPI",
             authDomain: "slave-card-game.firebaseapp.com",
@@ -52,31 +51,22 @@
             appId: "1:319088373934:web:18e4191d7621cb88f3fd3f"
         };
 
-        // 2. ตั้งชื่อ App ID สำหรับแยกข้อมูลใน Database (ใช้อะไรก็ได้ ภาษาอังกฤษ)
         const appId = 'my-slave-game-001';
 
-        // Initialize Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-
-        // --- ICONS (Replacement for Lucide script) ---
-        const IconSettings = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-        );
-        const IconPlusSquare = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
-        );
-        const IconLogIn = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
-        );
-        const IconLoader = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`${className} animate-spin`}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-        );
-
+        // --- ICONS ---
+        const IconSettings = ({ size = 24, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>);
+        const IconPlusSquare = ({ size = 24, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>);
+        const IconLogIn = ({ size = 24, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>);
+        const IconLoader = ({ size = 24, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`${className} animate-spin`}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>);
+        const IconCopy = ({ size = 24, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>);
+        const IconCrown = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m2 4 3 12h14l3-12-6 7-4-3-4 3-6-7zm5 16h10"/></svg>);
+        const IconSkull = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2"/><path d="m12.5 17-.5-1-.5 1h1z"/><path d="M16 20a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20"/></svg>);
 
         // --- AUDIO SYSTEM ---
         class AudioManager {
@@ -116,6 +106,14 @@
         const RANKS = ['3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A', '2'];
         const AVATARS = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮'];
 
+        const ROLES = {
+            KING: { name: 'King', icon: <IconCrown className="text-yellow-400" />, bg: 'bg-yellow-100', text: 'text-yellow-600' },
+            QUEEN: { name: 'Queen', icon: <IconCrown className="text-gray-400" />, bg: 'bg-gray-200', text: 'text-gray-600' },
+            DUKE: { name: 'Duke', icon: <span className="text-blue-500 text-lg font-bold">D</span>, bg: 'bg-blue-100', text: 'text-blue-600' },
+            PEOPLE: { name: 'People', icon: <span className="text-green-500 text-lg font-bold">P</span>, bg: 'bg-green-100', text: 'text-green-600' },
+            SLAVE: { name: 'Slave', icon: <IconSkull className="text-red-500" />, bg: 'bg-red-100', text: 'text-red-600' },
+        };
+
         // --- UTILS ---
         const generateDeck = () => {
             const deck = [];
@@ -146,7 +144,6 @@
 
         function SlaveGame() {
             const [user, setUser] = useState(null);
-
             const [view, setView] = useState('LOGIN');
             const [roomId, setRoomId] = useState('');
             const [roomData, setRoomData] = useState(null);
@@ -163,168 +160,295 @@
             const unsubscribeRoom = useRef(null);
             const processingTurn = useRef(false);
 
+            // Auth
             useEffect(() => {
-                if (!auth) {
-                    console.error("Firebase Auth not initialized");
-                    return;
-                }
                 const initAuth = async () => {
-                    try {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await auth.signInWithCustomToken(__initial_auth_token);
-                        } else {
-                            await auth.signInAnonymously();
-                        }
-                    } catch (e) {
-                        console.error("Auth failed:", e);
-                        alert("การยืนยันตัวตนล้มเหลว: " + e.message);
-                    }
+                    try { await auth.signInAnonymously(); }
+                    catch (e) { console.error("Auth failed:", e); alert("Auth Error: " + e.message); }
                 };
-                initAuth();
-                return auth.onAuthStateChanged(u => {
-                    if (u) setUser(u);
-                });
+                if (auth) initAuth();
+                return auth ? auth.onAuthStateChanged(u => { if (u) setUser(u); }) : null;
             }, []);
 
+            // Audio
             useEffect(() => {
                 audioManager.volume = volume / 100;
                 audioManager.enabled = isSoundOn;
                 audioManager.updateVolume();
             }, [volume, isSoundOn]);
 
+            // --- LOBBY ACTIONS ---
             const createRoom = async () => {
-                if (!user) {
-                    alert("กำลังเชื่อมต่อระบบ กรุณารอสักครู่... (หากรอนานโปรดรีเฟรช)");
-                    return;
-                }
-                if (!playerName.trim()) return alert("กรุณาใส่ชื่อเล่น");
-
-                setIsLoading(true);
-                audioManager.playClick();
-
+                if (!user || !playerName.trim()) return alert("กรุณาใส่ชื่อเล่น");
+                setIsLoading(true); audioManager.playClick();
                 try {
                     const newRoomRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('rooms').doc();
                     const roomCode = newRoomRef.id.substring(0, 5).toUpperCase();
-
-                    const initialData = {
+                    await newRoomRef.set({
                         code: roomCode,
                         hostId: user.uid,
                         status: 'WAITING',
-                        players: [{
-                            id: user.uid,
-                            name: playerName,
-                            avatar: avatar,
-                            hand: [],
-                            role: null,
-                            status: 'ready',
-                            isHost: true
-                        }],
+                        players: [{ id: user.uid, name: playerName, avatar, hand: [], role: null, status: 'ready', isHost: true }],
                         round: 1,
                         currentTurnIdx: 0,
                         centerPile: [],
                         passCount: 0,
                         winners: [],
                         lastTrickOwner: null,
+                        exchangeData: null,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    };
-
-                    await newRoomRef.set(initialData);
+                    });
                     joinRoomLogic(newRoomRef.id);
-                } catch (error) {
-                    console.error("Create Room Error:", error);
-                    alert("สร้างห้องไม่สำเร็จ: " + error.message);
-                    setIsLoading(false);
-                }
+                } catch (e) { alert("Error: " + e.message); setIsLoading(false); }
             };
 
             const joinRoom = async () => {
-                if (!user) return alert("กำลังเชื่อมต่อระบบ กรุณารอสักครู่...");
-                if (!roomId.trim() || !playerName.trim()) return alert("กรุณาใส่ชื่อและรหัสห้อง");
-
-                setIsLoading(true);
-                audioManager.playClick();
-
+                if (!user || !roomId.trim() || !playerName.trim()) return alert("กรุณาใส่ข้อมูลให้ครบ");
+                setIsLoading(true); audioManager.playClick();
                 try {
                     const roomsRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('rooms');
                     const snapshot = await roomsRef.where('code', '==', roomId.toUpperCase()).get();
-
-                    if (snapshot.empty) {
-                        setIsLoading(false);
-                        return alert("ไม่พบห้องนี้");
-                    }
+                    if (snapshot.empty) { setIsLoading(false); return alert("ไม่พบห้องนี้"); }
 
                     const roomDoc = snapshot.docs[0];
                     const room = roomDoc.data();
+                    if (room.status !== 'WAITING') { setIsLoading(false); return alert("เกมเริ่มไปแล้ว"); }
+                    if (room.players.length >= 8) { setIsLoading(false); return alert("ห้องเต็ม"); }
 
-                    if (room.status !== 'WAITING') {
-                        setIsLoading(false);
-                        return alert("เกมเริ่มไปแล้ว");
-                    }
-                    if (room.players.length >= 4) {
-                        setIsLoading(false);
-                        return alert("ห้องเต็มแล้ว");
-                    }
-
-                    // Check duplicate join
                     const alreadyIn = room.players.find(p => p.id === user.uid);
                     if (!alreadyIn) {
-                        const updatedPlayers = [...room.players, {
-                            id: user.uid,
-                            name: playerName,
-                            avatar: avatar,
-                            hand: [],
-                            role: null,
-                            status: 'ready',
-                            isHost: false
-                        }];
+                        const updatedPlayers = [...room.players, { id: user.uid, name: playerName, avatar, hand: [], role: null, status: 'ready', isHost: false }];
                         await roomsRef.doc(roomDoc.id).update({ players: updatedPlayers });
                     }
-
                     joinRoomLogic(roomDoc.id);
-                } catch (error) {
-                    console.error("Join Room Error:", error);
-                    alert("เข้าร่วมห้องไม่สำเร็จ: " + error.message);
-                    setIsLoading(false);
-                }
+                } catch (e) { alert("Error: " + e.message); setIsLoading(false); }
             };
 
             const joinRoomLogic = (docId) => {
-                setRoomId(docId);
-                setView('ROOM');
-                setIsLoading(false);
-
+                setRoomId(docId); setView('ROOM'); setIsLoading(false);
                 if (unsubscribeRoom.current) unsubscribeRoom.current();
-
                 unsubscribeRoom.current = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('rooms').doc(docId)
                     .onSnapshot(doc => {
                         if (doc.exists) {
                             const data = doc.data();
                             setRoomData(data);
+                            // Sound notification on turn
                             const myIdx = data.players.findIndex(p => p.id === user.uid);
                             if (data.status === 'PLAYING' && data.currentTurnIdx === myIdx && !processingTurn.current) {
                                 audioManager.playTurn();
                             }
+                            // Auto trigger end round check
+                            if (data.status === 'PLAYING' && data.winners.length >= data.players.length - 1) {
+                                // Only host triggers round end to avoid race conditions
+                                if (data.hostId === user.uid) endRound(doc.id, data);
+                            }
                         } else {
-                            alert("ห้องถูกยุบแล้ว");
-                            setView('LOBBY');
-                            setRoomData(null);
+                            alert("ห้องถูกยุบ"); setView('LOBBY'); setRoomData(null);
                         }
-                    }, error => {
-                        console.error("Snapshot Error:", error);
-                        // Don't alert here constantly, just log
                     });
             };
 
+            // --- GAMEPLAY ACTIONS ---
+            const startGame = async () => {
+                if (roomData.players.length < 4) return alert("ต้องการผู้เล่น 4 คนขึ้นไป");
+                startRound(1, roomData.players);
+            };
+
+            const startRound = async (roundNum, currentPlayers, assignedRoles = null) => {
+                const deck = generateDeck().sort(() => Math.random() - 0.5);
+                const handSize = Math.floor(52 / currentPlayers.length);
+
+                // Distribute Cards
+                const newPlayers = currentPlayers.map((p, i) => {
+                    const start = i * handSize;
+                    // Fix: Distribute remaining cards
+                    const extra = 52 % currentPlayers.length;
+                    // Simplified: just slice basic hand for now to avoid complexity in this file, or distribute remaining to first few
+                    const hand = sortHand(deck.slice(start, start + handSize));
+                    return {
+                        ...p,
+                        hand,
+                        status: 'playing',
+                        lastAction: null,
+                        role: assignedRoles ? assignedRoles[p.id] : p.role // Update role if provided
+                    };
+                });
+
+                // Round 1: 3 Clubs starts
+                let starterIdx = 0;
+                if (roundNum === 1) {
+                    starterIdx = newPlayers.findIndex(p => p.hand.some(c => c.id === '3-clubs'));
+                    if (starterIdx === -1) starterIdx = 0;
+
+                    await updateRoom({
+                        status: 'PLAYING',
+                        players: newPlayers,
+                        currentTurnIdx: starterIdx,
+                        centerPile: [],
+                        passCount: 0,
+                        winners: [],
+                        round: 1,
+                        exchangeData: null
+                    });
+                } else {
+                    // Round 2+: Exchange Phase
+                    // Logic: Auto Exchange based on Roles
+                    const exchangeData = calculateExchange(newPlayers);
+                    await updateRoom({
+                        status: 'EXCHANGE',
+                        players: exchangeData.playersWithReducedHands, // Hands with cards removed for exchange
+                        exchangeData: exchangeData,
+                        round: roundNum,
+                        winners: [],
+                        centerPile: [],
+                        passCount: 0
+                    });
+                }
+            };
+
+            // --- EXCHANGE LOGIC ---
+            const calculateExchange = (players) => {
+                // Find roles
+                const king = players.find(p => p.role === 'KING');
+                const queen = players.find(p => p.role === 'QUEEN');
+                const people = players.find(p => p.role === 'PEOPLE');
+                const slave = players.find(p => p.role === 'SLAVE');
+
+                // Deep copy to modify hands
+                const pList = JSON.parse(JSON.stringify(players));
+                const kingP = pList.find(p => p.id === king?.id);
+                const queenP = pList.find(p => p.id === queen?.id);
+                const peopleP = pList.find(p => p.id === people?.id);
+                const slaveP = pList.find(p => p.id === slave?.id);
+
+                const data = { pending: [] }; // { from, to, cards: [] }
+
+                // Slave gives 2 best to King
+                if (kingP && slaveP) {
+                    const best2 = slaveP.hand.slice(slaveP.hand.length - 2);
+                    slaveP.hand = slaveP.hand.slice(0, slaveP.hand.length - 2);
+                    // Add to King temporarily or wait for King to return?
+                    // Requirement: "ระบบต้องดึงไพ่... ส่งให้ King อัตโนมัติ"
+                    kingP.hand = sortHand([...kingP.hand, ...best2]);
+                    data.pending.push({ giver: 'KING', receiver: 'SLAVE', count: 2 }); // King needs to give back
+                }
+
+                // People gives 1 best to Queen
+                if (queenP && peopleP) {
+                    const best1 = peopleP.hand.slice(peopleP.hand.length - 1);
+                    peopleP.hand = peopleP.hand.slice(0, peopleP.hand.length - 1);
+                    queenP.hand = sortHand([...queenP.hand, ...best1]);
+                    data.pending.push({ giver: 'QUEEN', receiver: 'PEOPLE', count: 1 }); // Queen needs to give back
+                }
+
+                return { playersWithReducedHands: pList, pendingReturns: data.pending };
+            };
+
+            const submitExchangeReturn = async (cards) => {
+                // User selects cards to return
+                // Check if valid count
+                const myPending = roomData.exchangeData.pendingReturns.find(p => p.giver === roomData.players.find(pl => pl.id === user.uid).role);
+                if (!myPending) return;
+                if (cards.length !== myPending.count) return alert(`ต้องคืนไพ่ ${myPending.count} ใบ`);
+
+                const myIdx = roomData.players.findIndex(p => p.id === user.uid);
+                const myPlayer = roomData.players[myIdx];
+                const receiverRole = myPending.receiver;
+                const receiverIdx = roomData.players.findIndex(p => p.role === receiverRole);
+
+                // Update Hands
+                const newPlayers = [...roomData.players];
+                // Remove from Giver
+                newPlayers[myIdx].hand = myPlayer.hand.filter(c => !cards.some(sel => sel.id === c.id));
+                // Add to Receiver
+                const receiverHand = [...newPlayers[receiverIdx].hand, ...cards];
+                newPlayers[receiverIdx].hand = sortHand(receiverHand);
+
+                // Remove Pending
+                const newPending = roomData.exchangeData.pendingReturns.filter(p => p !== myPending);
+                const newExchangeData = { ...roomData.exchangeData, pendingReturns: newPending };
+
+                // If no more pending, Start Game
+                if (newPending.length === 0) {
+                     // Slave starts (Winner Start logic: "หลังจากแลกไพ่เสร็จ ... Slave เป็นผู้เริ่มเดินก่อน")
+                     const slaveIdx = newPlayers.findIndex(p => p.role === 'SLAVE');
+                     await updateRoom({
+                         status: 'PLAYING',
+                         players: newPlayers,
+                         exchangeData: null,
+                         currentTurnIdx: slaveIdx
+                     });
+                } else {
+                     await updateRoom({
+                         players: newPlayers,
+                         exchangeData: newExchangeData
+                     });
+                }
+                setSelectedCards([]);
+            };
+
+            // --- END ROUND & ROLE ASSIGNMENT ---
+            const endRound = async (rId, data) => {
+                // Determine Loser (the one left)
+                const loser = data.players.find(p => !data.winners.includes(p.id));
+                const allRankedIds = [...data.winners, loser.id];
+
+                // Assign Roles
+                const total = allRankedIds.length;
+                const newRoles = {};
+
+                allRankedIds.forEach((pid, i) => {
+                    let r = 'PEOPLE';
+                    if (i === 0) r = 'KING';
+                    else if (i === 1) r = 'QUEEN';
+                    else if (i === total - 1) r = 'SLAVE';
+                    else if (total > 4 && i === total - 2) r = 'PEOPLE'; // Second last
+                    else if (total > 4 && i >= 2) r = 'DUKE'; // Middle are Dukes
+
+                    newRoles[pid] = r;
+                });
+
+                // King Down Post-Process
+                const prevKing = data.players.find(p => p.role === 'KING');
+                if (prevKing) {
+                    const kingRank = allRankedIds.indexOf(prevKing.id);
+                    if (kingRank !== 0) {
+                        // King failed. Find who is assigned Slave currently
+                        const assignedSlaveId = Object.keys(newRoles).find(k => newRoles[k] === 'SLAVE');
+                        const exKingId = prevKing.id;
+
+                        // Swap roles: Ex-King becomes Slave. The person who was Slave becomes Ex-King's role?
+                        // Or Ex-King becomes Slave, and the real Slave moves up?
+                        // Standard rule: King trades with Scum(Slave).
+                        const originalRoleOfExKing = newRoles[exKingId];
+                        newRoles[exKingId] = 'SLAVE';
+                        newRoles[assignedSlaveId] = originalRoleOfExKing;
+                    }
+                }
+
+                // Start Next Round
+                startRound(data.round + 1, data.players, newRoles);
+            };
+
+            const updateRoom = async (data) => {
+                try { await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('rooms').doc(roomId).update(data); }
+                catch(e) { console.error(e); }
+            };
+
+            // --- VALIDATION & TURNS ---
             const getValidMoves = (hand, pile, isFirstRound) => {
                 const moves = [];
                 const topTrick = pile.length > 0 ? pile[pile.length - 1] : null;
+                // Auto Clear Check (If top trick is mine)
+                if (topTrick && topTrick.playerId === user.uid) {
+                    // I am the owner, I can play anything (Pile effectively cleared for me)
+                    // But to be UI friendly, treat as empty pile logic
+                    // ...Logic handled in UI/Effect, but here treat as no topTrick
+                    // Actually, let's stick to standard:
+                }
+
                 const grouped = {};
-
-                hand.forEach(c => {
-                    if (!grouped[c.rankIdx]) grouped[c.rankIdx] = [];
-                    grouped[c.rankIdx].push(c);
-                });
-
+                hand.forEach(c => { if (!grouped[c.rankIdx]) grouped[c.rankIdx] = []; grouped[c.rankIdx].push(c); });
                 const mustPlay3Clubs = isFirstRound && hand.some(c => c.id === '3-clubs') && pile.length === 0;
 
                 Object.values(grouped).forEach(group => {
@@ -336,18 +460,20 @@
 
                     combos.forEach(combo => {
                         if (mustPlay3Clubs && !combo.some(c => c.id === '3-clubs')) return;
-                        if (!topTrick) {
+
+                        // Treat as empty if I own the pile (Auto-clear rule implication)
+                        const effectiveTop = (topTrick && topTrick.playerId === user.uid) ? null : topTrick;
+
+                        if (!effectiveTop) {
                             moves.push(combo);
                         } else {
-                            const topCards = topTrick.cards;
+                            const topCards = effectiveTop.cards;
                             const topCount = topCards.length;
                             const topHigh = topCards[topCards.length - 1];
                             const myHigh = combo[combo.length - 1];
 
                             if (combo.length === topCount) {
-                                if (myHigh.rankIdx > topHigh.rankIdx || (myHigh.rankIdx === topHigh.rankIdx && myHigh.suitIdx > topHigh.suitIdx)) {
-                                    moves.push(combo);
-                                }
+                                if (myHigh.rankIdx > topHigh.rankIdx || (myHigh.rankIdx === topHigh.rankIdx && myHigh.suitIdx > topHigh.suitIdx)) moves.push(combo);
                             }
                             else if (topCount === 1 && combo.length === 3) moves.push(combo);
                             else if (topCount === 2 && combo.length === 4) moves.push(combo);
@@ -357,180 +483,169 @@
                 return moves;
             };
 
+            // Effect to calculate playable cards
             useEffect(() => {
                 if (!roomData || roomData.status !== 'PLAYING') return;
                 const myIdx = roomData.players.findIndex(p => p.id === user.uid);
-                if (myIdx === -1 || roomData.currentTurnIdx !== myIdx) {
+                if (myIdx === -1) return;
+
+                // If it's my turn
+                if (roomData.currentTurnIdx === myIdx) {
+                    const myHand = roomData.players[myIdx].hand;
+                    const moves = getValidMoves(myHand, roomData.centerPile, roomData.round === 1);
+                    const ids = new Set();
+                    moves.forEach(m => m.forEach(c => ids.add(c.id)));
+                    setPlayableCards(ids);
+                } else {
                     setPlayableCards(new Set());
-                    return;
                 }
-                const myHand = roomData.players[myIdx].hand;
-                const moves = getValidMoves(myHand, roomData.centerPile, roomData.round === 1);
-                const playableIds = new Set();
-                moves.forEach(move => move.forEach(card => playableIds.add(card.id)));
-                setPlayableCards(playableIds);
             }, [roomData]);
 
-            const startGame = async () => {
-                if (roomData.players.length < 2) return alert("ต้องการผู้เล่นอย่างน้อย 2 คน");
-                const deck = generateDeck().sort(() => Math.random() - 0.5);
-                const handSize = Math.floor(52 / roomData.players.length);
-                const newPlayers = roomData.players.map((p, i) => {
-                    const start = i * handSize;
-                    const hand = sortHand(deck.slice(start, start + handSize));
-                    return { ...p, hand, status: 'playing', lastAction: null };
-                });
-                let starterIdx = newPlayers.findIndex(p => p.hand.some(c => c.id === '3-clubs'));
-                if (starterIdx === -1) starterIdx = 0;
-
-                try {
-                    await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('rooms').doc(roomId).update({
-                        status: 'PLAYING',
-                        players: newPlayers,
-                        currentTurnIdx: starterIdx,
-                        centerPile: [],
-                        passCount: 0,
-                        winners: [],
-                        round: 1
-                    });
-                } catch(e) {
-                    alert("เริ่มเกมไม่สำเร็จ: " + e.message);
-                }
-            };
-
+            // Actions
             const handleCardClick = (card) => {
-                if (roomData.currentTurnIdx !== roomData.players.findIndex(p => p.id === user.uid)) return;
-                if (!playableCards.has(card.id)) {
-                    audioManager.playError();
+                if (roomData.status === 'EXCHANGE') {
+                    // Exchange Selection
+                    if (selectedCards.find(c => c.id === card.id)) setSelectedCards(selectedCards.filter(c => c.id !== card.id));
+                    else setSelectedCards([...selectedCards, card]);
                     return;
                 }
+
+                if (roomData.currentTurnIdx !== roomData.players.findIndex(p => p.id === user.uid)) return;
+                if (!playableCards.has(card.id)) { audioManager.playError(); return; }
                 audioManager.playClick();
-                if (selectedCards.find(c => c.id === card.id)) {
-                    setSelectedCards(selectedCards.filter(c => c.id !== card.id));
-                } else {
-                    setSelectedCards([...selectedCards, card]);
-                }
+                if (selectedCards.find(c => c.id === card.id)) setSelectedCards(selectedCards.filter(c => c.id !== card.id));
+                else setSelectedCards([...selectedCards, card]);
             };
 
             const submitPlay = async () => {
                 if (selectedCards.length === 0) return;
+                // If Exchange Phase
+                if (roomData.status === 'EXCHANGE') {
+                    submitExchangeReturn(selectedCards);
+                    return;
+                }
+
                 const myIdx = roomData.players.findIndex(p => p.id === user.uid);
                 const myPlayer = roomData.players[myIdx];
                 const sortedSelected = sortHand(selectedCards);
                 const moves = getValidMoves(myPlayer.hand, roomData.centerPile, roomData.round === 1);
                 const isValid = moves.some(m => m.length === sortedSelected.length && m.every((c, i) => c.id === sortedSelected[i].id));
 
-                if (!isValid) {
-                    audioManager.playError();
-                    alert("ลงไพ่ไม่ได้ผิดกฎ");
-                    setSelectedCards([]);
-                    return;
-                }
+                if (!isValid) { audioManager.playError(); alert("Invalid Move"); setSelectedCards([]); return; }
                 audioManager.playSnap();
 
                 const newHand = myPlayer.hand.filter(c => !sortedSelected.some(s => s.id === c.id));
                 const newPlayers = [...roomData.players];
                 newPlayers[myIdx] = { ...myPlayer, hand: newHand, lastAction: 'PLAY', status: 'playing' };
-                let nextIdx = (roomData.currentTurnIdx + 1) % roomData.players.length;
+
                 const updates = {
                     players: newPlayers,
                     centerPile: firebase.firestore.FieldValue.arrayUnion({ playerId: user.uid, cards: sortedSelected }),
                     passCount: 0,
-                    lastTrickOwner: user.uid,
-                    currentTurnIdx: nextIdx
+                    lastTrickOwner: user.uid
                 };
+
                 if (newHand.length === 0) {
                     audioManager.playWin();
                     updates.winners = firebase.firestore.FieldValue.arrayUnion(user.uid);
                     newPlayers[myIdx].status = 'finished';
-                    updates.players = newPlayers;
                 }
 
-                try {
-                    await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('rooms').doc(roomId).update(updates);
-                    setSelectedCards([]);
-                    advanceTurn(newPlayers, nextIdx, roomId);
-                } catch(e) {
-                    alert("เกิดข้อผิดพลาดในการลงไพ่: " + e.message);
+                // Calculate Next Turn
+                let nextIdx = (roomData.currentTurnIdx + 1) % roomData.players.length;
+                let loop = 0;
+                while(loop < newPlayers.length) {
+                    const p = newPlayers[nextIdx];
+                    // Skip finished or passed players
+                    if (p.hand.length > 0 && p.status !== 'passed') break;
+                    nextIdx = (nextIdx + 1) % newPlayers.length;
+                    loop++;
                 }
+                updates.currentTurnIdx = nextIdx;
+
+                // If everyone else passed or finished?
+                // Logic: If loop went full circle, it means no one else is valid.
+                // But we just played, so we are valid? No, we might have finished.
+                // If I finished, nextIdx is someone else.
+
+                await updateRoom(updates);
+                setSelectedCards([]);
             };
 
             const passTurn = async () => {
                 const myIdx = roomData.players.findIndex(p => p.id === user.uid);
                 const newPlayers = [...roomData.players];
-                newPlayers[myIdx].lastAction = 'PASS';
-                newPlayers[myIdx].status = 'passed';
+                newPlayers[myIdx].lastAction = 'PASS'; newPlayers[myIdx].status = 'passed';
                 audioManager.playClick();
 
+                // Find next
                 let nextIdx = (roomData.currentTurnIdx + 1) % roomData.players.length;
-                let newPassCount = roomData.passCount + 1;
-
-                try {
-                    await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('rooms').doc(roomId).update({
-                        players: newPlayers,
-                        passCount: newPassCount,
-                        currentTurnIdx: nextIdx
-                    });
-                    advanceTurn(newPlayers, nextIdx, roomId);
-                } catch(e) {
-                    alert("ผ่านไม่สำเร็จ: " + e.message);
-                }
-            };
-
-            const advanceTurn = async (players, idx, rId) => {
-                let current = idx;
                 let loop = 0;
-                let foundNext = false;
-                while(loop < players.length) {
-                    const p = players[current];
-                    if (p.hand.length > 0 && p.status !== 'passed') {
-                        foundNext = true;
-                        break;
-                    }
-                    current = (current + 1) % players.length;
+                let found = false;
+                while(loop < newPlayers.length) {
+                    const p = newPlayers[nextIdx];
+                    if (p.hand.length > 0 && p.status !== 'passed') { found = true; break; }
+                    nextIdx = (nextIdx + 1) % newPlayers.length;
                     loop++;
                 }
 
-                if (foundNext) {
-                     await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('rooms').doc(rId).update({
-                        currentTurnIdx: current
-                    });
+                if (!found) {
+                     // Everyone passed. Clear Trick. Turn goes to Owner.
+                     // Owner is roomData.lastTrickOwner
+                     const ownerIdx = newPlayers.findIndex(p => p.id === roomData.lastTrickOwner);
+                     // If Owner finished? Then turn goes to... who?
+                     // Rule: "ผู้ที่ลงไพ่คนสุดท้ายเป็นผู้เริ่มรอบใหม่" (Last owner)
+                     // If Last Owner has finished, usually next person in circle starts.
+                     let startIdx = ownerIdx;
+                     if (newPlayers[ownerIdx].hand.length === 0) {
+                         // Find next active after owner
+                         startIdx = (ownerIdx + 1) % newPlayers.length;
+                         while (newPlayers[startIdx].hand.length === 0) startIdx = (startIdx + 1) % newPlayers.length;
+                     }
+
+                     // Reset Statuses
+                     const resetPlayers = newPlayers.map(p => ({ ...p, status: p.hand.length > 0 ? 'playing' : 'finished', lastAction: null }));
+                     await updateRoom({ players: resetPlayers, centerPile: [], passCount: 0, currentTurnIdx: startIdx });
                 } else {
-                    clearTrick(rId, players);
+                     await updateRoom({ players: newPlayers, passCount: roomData.passCount + 1, currentTurnIdx: nextIdx });
                 }
             };
 
-            const clearTrick = async (rId, currentPlayers) => {
-                const resetPlayers = currentPlayers.map(p => ({
-                    ...p,
-                    status: p.hand.length > 0 ? 'playing' : 'finished',
-                    lastAction: null
-                }));
-                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('rooms').doc(rId).update({
-                    centerPile: [],
-                    passCount: 0,
-                    players: resetPlayers
-                });
-            };
+            // Auto Clear Logic Fix:
+            // If current turn player == lastTrickOwner, it means everyone else passed.
+            // UI should show "Start New Trick" or just Play (which clears pile logic).
+            // We handled this in getValidMoves by ignoring topTrick if owner matches.
+            // But visually we might want to clear the pile?
+            // Let's add an effect to clear pile if currentTurn == lastOwner
+            useEffect(() => {
+                if (roomData && roomData.status === 'PLAYING' && roomData.centerPile.length > 0) {
+                     const currentPlayer = roomData.players[roomData.currentTurnIdx];
+                     if (currentPlayer.id === roomData.lastTrickOwner && currentPlayer.id === user.uid) {
+                         // I am the owner and it's my turn -> Everyone passed.
+                         // Clear pile for visual clarity?
+                         // Or just let them play on top (logic handles it).
+                         // Better to clear database for sync.
+                         // Only Host should trigger this to avoid multi-write? Or the Active Player.
+                         // Active Player triggers:
+                         updateRoom({ centerPile: [], passCount: 0, players: roomData.players.map(p=>({...p, status: p.hand.length>0?'playing':'finished'})) });
+                     }
+                }
+            }, [roomData]);
 
-            // --- VIEW RENDER ---
+            const copyCode = () => { navigator.clipboard.writeText(roomData.code); alert("Copied!"); };
+
+            // --- VIEW ---
             if (view === 'LOGIN') {
                 return (
                     <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
                         <div className="bg-gray-800 p-8 rounded-2xl shadow-2xl border border-gray-700 max-w-md w-full text-center">
                             <h1 className="text-5xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-red-500 animate-float">SLAVE</h1>
-                            <p className="text-gray-400 mb-8">Online Multiplayer</p>
                             <div className="space-y-4">
-                                <input type="text" placeholder="ชื่อของคุณ" value={playerName} onChange={e=>setPlayerName(e.target.value)}
-                                    className="w-full bg-gray-700 text-white rounded-lg p-3 text-center text-lg outline-none focus:ring-2 focus:ring-yellow-500" />
+                                <input type="text" placeholder="Your Name" value={playerName} onChange={e=>setPlayerName(e.target.value)} className="w-full bg-gray-700 text-white rounded-lg p-3 text-center" />
                                 <div className="flex justify-center gap-2 flex-wrap">
-                                    {AVATARS.map(a => (
-                                        <button key={a} onClick={()=>setAvatar(a)} className={`text-2xl p-2 rounded-full transition ${avatar===a ? 'bg-yellow-500 scale-110' : 'bg-gray-700 hover:bg-gray-600'}`}>{a}</button>
-                                    ))}
+                                    {AVATARS.map(a => <button key={a} onClick={()=>setAvatar(a)} className={`text-2xl p-2 rounded-full ${avatar===a ? 'bg-yellow-500' : 'bg-gray-700'}`}>{a}</button>)}
                                 </div>
-                                <button onClick={()=>setView('LOBBY')} disabled={!user} className={`w-full text-black font-bold py-3 rounded-lg text-xl transition transform active:scale-95 ${user ? 'bg-yellow-500 hover:bg-yellow-400' : 'bg-gray-600 cursor-not-allowed'}`}>
-                                    {user ? 'เข้าสู่ล็อบบี้' : 'กำลังเชื่อมต่อ...'}
-                                </button>
+                                <button onClick={()=>setView('LOBBY')} disabled={!user} className="w-full bg-yellow-500 text-black font-bold py-3 rounded-lg">{user ? 'ENTER LOBBY' : 'Connecting...'}</button>
                             </div>
                         </div>
                     </div>
@@ -541,76 +656,81 @@
                 return (
                     <div className="min-h-screen bg-gray-900 p-4 flex flex-col items-center">
                         <div className="w-full max-w-2xl bg-gray-800 rounded-xl p-6 shadow-xl border border-gray-700">
-                            <div className="flex justify-between items-center mb-6">
-                                <div className="flex items-center gap-3">
-                                    <span className="text-4xl">{avatar}</span>
-                                    <div><h2 className="text-2xl font-bold">{playerName}</h2><span className="text-green-400 text-sm">● Online</span></div>
-                                </div>
-                                <button onClick={()=>setSettingsOpen(true)} className="p-2 bg-gray-700 rounded-full hover:bg-gray-600"><IconSettings size={24}/></button>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <button onClick={createRoom} disabled={isLoading} className="bg-indigo-600 p-8 rounded-xl hover:bg-indigo-500 transition group flex flex-col items-center justify-center relative">
-                                    {isLoading ? <IconLoader size={48} className="text-white"/> : <IconPlusSquare size={48} className="mx-auto mb-2 text-indigo-300 group-hover:scale-110 transition"/>}
-                                    <div className="text-xl font-bold mt-2">สร้างห้อง</div>
-                                    <div className="text-sm opacity-60">เป็น Host สร้างเกมใหม่</div>
-                                </button>
-                                <div className="bg-gray-700 p-8 rounded-xl">
-                                    <IconLogIn size={48} className="mx-auto mb-2 text-gray-400"/>
-                                    <div className="text-xl font-bold mb-2 text-center">เข้าร่วมห้อง</div>
-                                    <div className="flex gap-2">
-                                        <input type="text" placeholder="CODE" value={roomId} onChange={e=>setRoomId(e.target.value)}
-                                            className="w-full bg-gray-800 p-2 rounded text-center uppercase tracking-widest font-mono" />
-                                        <button onClick={joinRoom} disabled={isLoading} className="bg-green-600 px-4 rounded font-bold hover:bg-green-500 min-w-[60px] flex justify-center items-center">
-                                            {isLoading ? <IconLoader size={20}/> : 'GO'}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                             <div className="flex justify-between mb-6">
+                                 <div className="flex items-center gap-3"><span className="text-4xl">{avatar}</span><span className="text-2xl font-bold">{playerName}</span></div>
+                                 <button onClick={()=>setSettingsOpen(true)}><IconSettings/></button>
+                             </div>
+                             <div className="grid grid-cols-2 gap-4">
+                                 <button onClick={createRoom} disabled={isLoading} className="bg-indigo-600 p-8 rounded-xl flex flex-col items-center">
+                                     {isLoading ? <IconLoader/> : <IconPlusSquare size={48}/>} <span className="mt-2 font-bold">Create Room</span>
+                                 </button>
+                                 <div className="bg-gray-700 p-8 rounded-xl">
+                                     <IconLogIn size={48} className="mx-auto mb-2"/>
+                                     <div className="flex gap-2"><input placeholder="CODE" value={roomId} onChange={e=>setRoomId(e.target.value)} className="w-full bg-gray-800 p-2 text-center" /> <button onClick={joinRoom} className="bg-green-600 px-4 font-bold">GO</button></div>
+                                 </div>
+                             </div>
                         </div>
                         {settingsOpen && (
-                            <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
-                                <div className="bg-gray-800 p-6 rounded-xl w-80 border border-gray-600">
-                                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><IconSettings/> ตั้งค่า</h3>
-                                    <div className="mb-4">
-                                        <label className="flex items-center justify-between mb-2"><span>เสียงประกอบ</span><input type="checkbox" checked={isSoundOn} onChange={e=>setIsSoundOn(e.target.checked)} className="toggle" /></label>
-                                        <input type="range" min="0" max="100" value={volume} onChange={e=>setVolume(e.target.value)} className="w-full accent-yellow-500" disabled={!isSoundOn} />
-                                    </div>
-                                    <button onClick={()=>setSettingsOpen(false)} className="w-full bg-gray-600 py-2 rounded font-bold hover:bg-gray-500">ปิด</button>
+                            <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"><div className="bg-gray-800 p-6 rounded-xl w-80"><button onClick={()=>setSettingsOpen(false)} className="w-full bg-gray-600 py-2">Close</button></div></div>
+                        )}
+                    </div>
+                );
+            }
+
+            if (!roomData) return <div className="min-h-screen bg-gray-900 flex items-center justify-center"><IconLoader size={48}/></div>;
+            const myPlayerIdx = roomData.players.findIndex(p => p.id === user.uid);
+            const myPlayer = roomData.players[myPlayerIdx];
+            const isMyTurn = roomData.status === 'PLAYING' && roomData.currentTurnIdx === myPlayerIdx;
+
+            // Exchange Mode UI
+            if (roomData.status === 'EXCHANGE') {
+                const myPending = roomData.exchangeData.pendingReturns.find(p => p.giver === myPlayer.role);
+                const isWaiting = !myPending;
+
+                return (
+                    <div className="min-h-screen bg-[#1a4731] flex flex-col items-center justify-center p-4">
+                        <h2 className="text-3xl font-bold mb-4 text-yellow-400">Exchange Phase</h2>
+                        {isWaiting ? (
+                            <div className="text-xl animate-pulse">Waiting for King/Queen to return cards...</div>
+                        ) : (
+                            <div className="bg-black/50 p-6 rounded-xl text-center">
+                                <div className="text-xl mb-4">You are <span className="font-bold">{myPlayer.role}</span>. Return {myPending.count} cards to {myPending.receiver}.</div>
+                                <div className="flex gap-2 justify-center mb-6">
+                                    {myPlayer.hand.map(c => (
+                                        <div key={c.id} onClick={() => handleCardClick(c)}
+                                             className={`w-16 h-24 bg-white text-black rounded flex items-center justify-center border-2 cursor-pointer ${selectedCards.find(s=>s.id===c.id)?'border-yellow-400 -translate-y-2':'border-gray-400'}`}>
+                                            <span className={c.color}>{c.display} {c.symbol}</span>
+                                        </div>
+                                    ))}
                                 </div>
+                                <button onClick={submitPlay} disabled={selectedCards.length !== myPending.count} className="bg-green-600 px-8 py-3 rounded-full font-bold disabled:opacity-50">Confirm Return</button>
                             </div>
                         )}
                     </div>
                 );
             }
 
-            if (!roomData) return <div className="min-h-screen bg-gray-900 flex items-center justify-center"><IconLoader size={48} className="text-white"/></div>;
-            const myPlayerIdx = roomData.players.findIndex(p => p.id === user.uid);
-            const myPlayer = roomData.players[myPlayerIdx];
-            const isMyTurn = roomData.status === 'PLAYING' && roomData.currentTurnIdx === myPlayerIdx;
-            const opponents = roomData.players.filter(p => p.id !== user.uid);
-
             return (
                 <div className="min-h-screen bg-[#1a4731] relative overflow-hidden select-none">
-                    <div className="absolute inset-0 opacity-10 pointer-events-none" style={{backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '30px 30px'}}></div>
-                    <div className="absolute top-0 w-full p-4 flex justify-between items-start z-20">
-                        <div className="glass-panel px-4 py-2 rounded-lg flex flex-col"><span className="text-xs opacity-70">ROOM CODE</span><span className="text-2xl font-mono font-bold text-yellow-400 tracking-widest">{roomData.code}</span></div>
-                        <button onClick={()=>setSettingsOpen(true)} className="glass-panel p-2 rounded-full hover:bg-white/10"><IconSettings size={20}/></button>
+                    <div className="absolute top-0 w-full p-4 flex justify-between z-20">
+                        <div className="glass-panel px-4 py-2 rounded-lg"><span className="text-xs opacity-70">CODE</span> <span onClick={copyCode} className="text-xl font-mono font-bold text-yellow-400 cursor-pointer">{roomData.code}</span></div>
                     </div>
 
                     {roomData.status === 'WAITING' && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center z-30 bg-black/50 backdrop-blur-sm">
-                            <h2 className="text-3xl font-bold mb-8">Waiting for Players... ({roomData.players.length}/4)</h2>
-                            <div className="flex gap-8 mb-12">
+                        <div className="absolute inset-0 flex flex-col items-center justify-center z-30 bg-black/80 backdrop-blur-sm">
+                             <div className="mb-8 flex flex-col items-center bg-gray-800 p-6 rounded-2xl border-2 border-yellow-500 cursor-pointer" onClick={copyCode}>
+                                <span className="text-gray-400 text-sm font-bold uppercase">Room Code</span>
+                                <div className="flex items-center gap-3"><span className="text-6xl font-mono font-black text-yellow-400">{roomData.code}</span><IconCopy/></div>
+                            </div>
+                            <h2 className="text-3xl font-bold mb-8">Players ({roomData.players.length}/8)</h2>
+                            <div className="flex flex-wrap justify-center gap-8 mb-12">
                                 {roomData.players.map(p => (
-                                    <div key={p.id} className="flex flex-col items-center animate-float" style={{animationDelay: Math.random()+'s'}}>
-                                        <div className="text-6xl mb-2">{p.avatar}</div>
-                                        <div className="bg-black/50 px-3 py-1 rounded-full text-sm font-bold">{p.name}</div>
-                                        {p.isHost && <span className="text-yellow-400 text-xs mt-1">👑 HOST</span>}
+                                    <div key={p.id} className="flex flex-col items-center animate-float">
+                                        <div className="text-6xl">{p.avatar}</div><div className="bg-black/50 px-3 py-1 rounded-full text-sm font-bold">{p.name}</div>
                                     </div>
                                 ))}
                             </div>
-                            {myPlayer.isHost && <button onClick={startGame} className="bg-green-500 text-white px-12 py-4 rounded-full text-2xl font-bold shadow-lg hover:bg-green-400 transition hover:scale-105">START GAME</button>}
-                            {!myPlayer.isHost && <p className="animate-pulse">Waiting for Host to start...</p>}
+                            {myPlayer.isHost && <button onClick={startGame} disabled={roomData.players.length < 4} className={`px-12 py-4 rounded-full text-2xl font-bold ${roomData.players.length>=4?'bg-green-500':'bg-gray-600'}`}>START GAME</button>}
                         </div>
                     )}
 
@@ -618,30 +738,34 @@
                         {roomData.centerPile.length > 0 && (
                             <div className="relative">
                                 {roomData.centerPile[roomData.centerPile.length-1].cards.map((c, i) => (
-                                    <div key={i} className="absolute w-24 h-36 bg-white rounded-lg shadow-xl border border-gray-300 flex flex-col items-center justify-center animate-float"
-                                         style={{ left: (i - roomData.centerPile[roomData.centerPile.length-1].cards.length/2) * 20 + 'px', top: '-70px', transform: `rotate(${(i - roomData.centerPile[roomData.centerPile.length-1].cards.length/2) * 10}deg)` }}>
-                                        <div className={`text-2xl font-bold absolute top-1 left-2 ${c.color}`}>{c.display}</div>
+                                    <div key={i} className="absolute w-24 h-36 bg-white rounded-lg shadow-xl border border-gray-300 flex flex-col items-center justify-center"
+                                         style={{ left: (i - roomData.centerPile[roomData.centerPile.length-1].cards.length/2)*20+'px', top: '-70px', transform: `rotate(${(i-roomData.centerPile[roomData.centerPile.length-1].cards.length/2)*10}deg)` }}>
                                         <div className={`text-5xl ${c.color}`}>{c.symbol}</div>
-                                        <div className={`text-2xl font-bold absolute bottom-1 right-2 rotate-180 ${c.color}`}>{c.display}</div>
+                                        <div className={`absolute top-1 left-2 font-bold ${c.color}`}>{c.display}</div>
                                     </div>
                                 ))}
-                                <div className="absolute top-24 left-1/2 -translate-x-1/2 mt-4 bg-black/60 px-3 py-1 rounded-full text-xs whitespace-nowrap">{roomData.players.find(p => p.id === roomData.centerPile[roomData.centerPile.length-1].playerId)?.name}</div>
+                                <div className="absolute top-24 left-1/2 -translate-x-1/2 mt-4 bg-black/60 px-3 py-1 rounded-full text-xs">{roomData.players.find(p => p.id === roomData.centerPile[roomData.centerPile.length-1].playerId)?.name}</div>
                             </div>
                         )}
                         {roomData.centerPile.length === 0 && <span className="text-white/20 font-bold">TABLE</span>}
                     </div>
 
-                    {opponents.map((p, idx) => {
+                    {/* Opponents Rendering (Simplified Circle) */}
+                    {roomData.players.filter(p => p.id !== user.uid).map((p, idx, arr) => {
                         const isTurn = roomData.players[roomData.currentTurnIdx].id === p.id;
-                        const posClass = idx === 0 ? 'top-[30%] left-4' : idx === 1 ? 'top-[10%] left-1/2 -translate-x-1/2' : 'top-[30%] right-4';
+                        const step = 80 / (arr.length - 1 || 1);
+                        const style = { top: '15%', left: `${10 + idx * step}%`, transform: 'translateX(-50%)' };
+                        if (arr.length === 1) style.left = '50%';
+
                         return (
-                            <div key={p.id} className={`absolute flex flex-col items-center transition-all duration-300 ${posClass}`}>
-                                <div className={`relative w-16 h-16 rounded-full border-4 flex items-center justify-center text-3xl bg-gray-800 ${isTurn ? 'border-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.6)] scale-110' : 'border-gray-600'}`}>
+                            <div key={p.id} className="absolute flex flex-col items-center transition-all duration-300" style={style}>
+                                <div className={`w-16 h-16 rounded-full border-4 flex items-center justify-center text-3xl bg-gray-800 ${isTurn ? 'border-yellow-400 scale-110 shadow-[0_0_20px_gold]' : 'border-gray-600'}`}>
                                     {p.avatar}
-                                    {p.status === 'passed' && <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center text-xs font-bold text-red-500">PASS</div>}
+                                    {p.role && <div className={`absolute -bottom-2 -right-2 text-xs px-1 rounded ${ROLES[p.role]?.bg} ${ROLES[p.role]?.text}`}>{ROLES[p.role]?.icon}</div>}
                                 </div>
-                                <div className="bg-black/50 px-2 py-1 rounded mt-1 text-xs">{p.name}</div>
-                                <div className="flex -space-x-1 mt-1">{Array.from({length: Math.min(p.hand.length, 5)}).map((_, i) => (<div key={i} className="w-3 h-4 bg-red-600 border border-white rounded-sm"></div>))}<span className="text-xs ml-2 font-bold">{p.hand.length}</span></div>
+                                <div className="bg-black/50 px-2 py-1 rounded mt-1 text-xs">{p.name} ({p.hand.length})</div>
+                                {p.status === 'passed' && <div className="text-red-500 font-bold text-xs">PASS</div>}
+                                {p.status === 'finished' && <div className="text-green-400 font-bold text-xs">WINNER</div>}
                             </div>
                         );
                     })}
@@ -649,11 +773,11 @@
                     <div className="absolute bottom-0 w-full flex flex-col items-center pb-6 pt-12 bg-gradient-to-t from-black/90 to-transparent">
                         {isMyTurn && (
                             <div className="absolute -top-16 flex gap-4 animate-float">
-                                <button onClick={submitPlay} disabled={selectedCards.length === 0} className={`px-8 py-3 rounded-full font-bold shadow-lg transition transform active:scale-95 border-2 border-white/20 ${selectedCards.length > 0 ? 'bg-yellow-500 text-black hover:bg-yellow-400' : 'bg-gray-600 text-gray-400 opacity-50'}`}>ลงไพ่</button>
-                                <button onClick={passTurn} className="px-8 py-3 bg-red-600 text-white rounded-full font-bold shadow-lg hover:bg-red-500 transition transform active:scale-95 border-2 border-white/20">ผ่าน</button>
+                                <button onClick={submitPlay} disabled={selectedCards.length === 0} className="px-8 py-3 rounded-full font-bold shadow-lg bg-yellow-500 text-black hover:bg-yellow-400 border-2 border-white/20 disabled:opacity-50">PLAY</button>
+                                <button onClick={passTurn} className="px-8 py-3 bg-red-600 text-white rounded-full font-bold shadow-lg hover:bg-red-500 border-2 border-white/20">PASS</button>
                             </div>
                         )}
-                        {myPlayer.status === 'passed' && <div className="absolute -top-12 text-red-500 font-bold text-2xl animate-pulse">คุณผ่าน</div>}
+                        {myPlayer.status === 'passed' && <div className="absolute -top-12 text-red-500 font-bold text-2xl animate-pulse">PASSED</div>}
 
                         <div className="flex -space-x-5 hover:space-x-0 transition-all duration-300 h-36 px-4 max-w-full overflow-x-auto no-scrollbar items-end">
                             {myPlayer.hand.map((card, idx) => {
@@ -663,31 +787,18 @@
                                     <div key={card.id} onClick={() => handleCardClick(card)}
                                         className={`relative w-24 h-36 bg-white rounded-lg border border-gray-300 shadow-2xl flex flex-col items-center justify-between p-2 flex-shrink-0 transition-all duration-200 ${isSelected ? 'card-selected' : ''} ${isMyTurn && !isPlayable ? 'card-disabled' : 'card-playable'} ${!isMyTurn ? 'opacity-80' : ''}`}
                                         style={{ zIndex: isSelected ? 50 : idx }}>
-                                        <div className="w-full flex justify-between leading-none"><span className={`text-lg font-bold ${card.color}`}>{card.display}</span><span className={`text-lg ${card.color}`}>{card.symbol}</span></div>
                                         <div className={`text-5xl ${card.color}`}>{card.symbol}</div>
-                                        <div className="w-full flex justify-end leading-none rotate-180"><span className={`text-lg font-bold ${card.color}`}>{card.display}</span></div>
+                                        <div className={`absolute top-1 left-2 font-bold ${card.color}`}>{card.display}</div>
+                                        <div className={`absolute bottom-1 right-2 font-bold rotate-180 ${card.color}`}>{card.display}</div>
                                     </div>
                                 );
                             })}
                         </div>
                         <div className="mt-4 flex items-center gap-4 bg-white/10 px-6 py-2 rounded-full backdrop-blur-md border border-white/10">
                             <div className="text-3xl">{myPlayer.avatar}</div>
-                            <div className="text-left"><div className="font-bold text-lg leading-none">{myPlayer.name}</div><div className="text-xs opacity-70">YOU</div></div>
-                            {isMyTurn && <div className="ml-4 text-yellow-400 font-bold text-sm animate-pulse">YOUR TURN</div>}
+                            <div className="text-left"><div className="font-bold text-lg leading-none">{myPlayer.name}</div><div className="text-xs opacity-70 text-yellow-400 font-bold">{myPlayer.role || 'Commoner'}</div></div>
                         </div>
                     </div>
-                    {settingsOpen && (
-                            <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
-                                <div className="bg-gray-800 p-6 rounded-xl w-80 border border-gray-600">
-                                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><IconSettings/> ตั้งค่า</h3>
-                                    <div className="mb-4">
-                                        <label className="flex items-center justify-between mb-2"><span>เสียงประกอบ</span><input type="checkbox" checked={isSoundOn} onChange={e=>setIsSoundOn(e.target.checked)} className="toggle" /></label>
-                                        <input type="range" min="0" max="100" value={volume} onChange={e=>setVolume(e.target.value)} className="w-full accent-yellow-500" disabled={!isSoundOn} />
-                                    </div>
-                                    <button onClick={()=>setSettingsOpen(false)} className="w-full bg-gray-600 py-2 rounded font-bold hover:bg-gray-500">ปิด</button>
-                                </div>
-                            </div>
-                        )}
                 </div>
             );
         }
