@@ -108,6 +108,7 @@
         // --- CONSTANTS ---
         const SUITS = ['clubs', 'diamonds', 'hearts', 'spades'];
         const RANKS = ['3','4','5','6','7','8','9','10','J','Q','K','A','2'];
+        // Changed cow to pear
         const AVATARS = ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🍐'];
         const ROLES = {
             KING: { name: 'King', icon: <IconCrown className="text-yellow-400"/>, bg: 'bg-yellow-100/10 border-yellow-500', text: 'text-yellow-400' },
@@ -770,7 +771,7 @@
                             <div className="bg-gray-800 p-6 rounded-xl w-80 border border-gray-600">
                                 <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><IconSettings/> ตั้งค่า</h3>
                                 <div className="mb-6">
-                                    <label className="flex items-center justify-between mb-2"><span>เสียงประกอบ</span><input type="checkbox" checked={isSoundOn} onChange={e=>setIsSoundOn(e.target.checked)} className="toggle" /></label>
+                                    <label className="flex items-center justify-between mb-2"><span>เสียงประกอบ</span><input type="checkbox" checked={isSoundOn} onChange={e=>setIsSoundOn(e.target.checked)} className="toggle accent-green-500 h-5 w-5" /></label>
                                     <input type="range" min="0" max="100" value={volume} onChange={e=>setVolume(e.target.value)} className="w-full accent-yellow-500" disabled={!isSoundOn} />
                                 </div>
                                 <button onClick={()=>setSettingsOpen(false)} className="w-full bg-gray-600 py-2 rounded font-bold hover:bg-gray-500">ปิด</button>
