@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Slave Online - Ultimate</title>
+    <title>Slave Card Game Online</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -28,11 +28,13 @@
         .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* Card Styles - Adjusted for opacity fix */
-        .card-disabled { filter: grayscale(100%) brightness(0.6); cursor: not-allowed; transform: scale(0.95); opacity: 0.7; }
+        /* Card Styles - FIX: Removed opacity to prevent see-through */
+        .card-disabled { filter: grayscale(100%) brightness(0.8); cursor: not-allowed; transform: scale(0.95); }
+        /* Removed opacity: 0.7 from above */
+
         .card-playable { cursor: pointer; filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5)); transition: transform 0.2s; }
         .card-playable:hover { transform: translateY(-15px) !important; }
-        /* Selected state moves card up */
+
         .card-selected { transform: translateY(-25px) scale(1.1) !important; z-index: 50 !important; filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.9)); border-color: #facc15 !important; }
         .card-new { border: 2px solid #34d399 !important; box-shadow: 0 0 15px #34d399; }
 
@@ -40,8 +42,10 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Mobile Specific Overrides */
         .hand-container { -webkit-overflow-scrolling: touch; padding-bottom: 20px; }
+
+        /* Modal Scroll */
+        .modal-content { max-height: 80vh; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -64,11 +68,13 @@
         const auth = firebase.auth();
 
         // --- ICONS ---
-        const IconSettings = ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
+        const IconBook = ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>;
+        const IconPlusSquare = ({ size = 24, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>);
+        const IconLogIn = ({ size = 24, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>);
+        const IconLoader = ({ size = 24, className = "" }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`${className} animate-spin`}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>);
         const IconCopy = ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>;
         const IconCrown = ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m2 4 3 12h14l3-12-6 7-4-3-4 3-6-7zm5 16h10"/></svg>;
         const IconSkull = ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2"/><path d="m12.5 17-.5-1-.5 1h1z"/><path d="M16 20a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20"/></svg>;
-        const IconLoader = ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`${className} animate-spin`}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>;
         const IconRefresh = ({className}) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21.5 2v6h-6"/><path d="M2.5 22v-6h6"/><path d="M2 11.5a10 10 0 0 1 18.8-4.3L21.5 8"/><path d="M22 12.5a10 10 0 0 1-18.8 4.2L2.5 16"/></svg>;
 
         // --- AUDIO ---
@@ -108,7 +114,6 @@
         // --- CONSTANTS ---
         const SUITS = ['clubs', 'diamonds', 'hearts', 'spades'];
         const RANKS = ['3','4','5','6','7','8','9','10','J','Q','K','A','2'];
-        // Changed cow to pear
         const AVATARS = ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🍐'];
         const ROLES = {
             KING: { name: 'King', icon: <IconCrown className="text-yellow-400"/>, bg: 'bg-yellow-100/10 border-yellow-500', text: 'text-yellow-400' },
@@ -148,7 +153,7 @@
 
             const [selectedCards, setSelectedCards] = useState([]);
             const [playableCards, setPlayableCards] = useState(new Set());
-            const [settingsOpen, setSettingsOpen] = useState(false);
+            const [showRules, setShowRules] = useState(false);
             const [volume, setVolume] = useState(50);
             const [isSoundOn, setIsSoundOn] = useState(true);
             const [isLoading, setIsLoading] = useState(false);
@@ -369,46 +374,29 @@
             // --- CLICK LOGIC (Auto Select) ---
             const handleCardClick = (card) => {
                 if(roomData.status==='EXCHANGE') {
-                    if(selectedCards.find(s=>s.id===c.id)) setSelectedCards(selectedCards.filter(s=>s.id!==c.id));
-                    else setSelectedCards([...selectedCards,c]);
+                    if(selectedCards.find(s=>s.id===card.id)) setSelectedCards(selectedCards.filter(s=>s.id!==card.id));
+                    else setSelectedCards([...selectedCards,card]);
                     return;
                 }
 
-                // Only allow click if it's my turn
                 if(roomData.currentTurnIdx!==roomData.players.findIndex(p=>p.id===user.uid)) return;
-
-                // Only allow valid playable cards
                 if(!playableCards.has(card.id)) { audio.playError(); return; }
                 audio.playClick();
 
-                // AUTO-SELECT LOGIC
                 const pile = roomData.centerPile;
                 const topTrick = (pile.length > 0 && pile[pile.length - 1].playerId !== user.uid) ? pile[pile.length - 1] : null;
 
                 if (topTrick && topTrick.cards.length > 1) {
-                    // If pile needs Pairs/Triples/Quads
                     const myHand = roomData.players.find(p=>p.id===user.uid).hand;
                     const sameRankCards = myHand.filter(c => c.rankIdx === card.rankIdx);
-
-                    // Check if we are selecting or deselecting
                     const isSelected = selectedCards.some(c => c.id === card.id);
 
                     if (isSelected) {
-                        // Deselect all of this rank
                         setSelectedCards(selectedCards.filter(c => c.rankIdx !== card.rankIdx));
                     } else {
-                        // Select all of this rank (add to existing selection, though usually you pick one set)
-                        // Smart logic: Clear other ranks first because you can only play one rank at a time
-                        const otherRankSelected = selectedCards.filter(c => c.rankIdx !== card.rankIdx);
-                        // Usually clean sweep is better:
-                        // setSelectedCards(sameRankCards);
-
-                        // But let's support multi-touch just in case, sticking to user request "select all of that number"
-                        // I will replace selection with this rank group for convenience
                         setSelectedCards(sameRankCards);
                     }
                 } else {
-                    // Standard Single Toggle
                     if(selectedCards.find(s=>s.id===card.id)) setSelectedCards(selectedCards.filter(s=>s.id!==card.id));
                     else setSelectedCards([...selectedCards, card]);
                 }
@@ -416,7 +404,6 @@
 
             const submit = async () => {
                 if(!selectedCards.length) return;
-                // Exchange
                 if(roomData.status==='EXCHANGE') {
                     const pending = roomData.exchangeData.pendingReturns.find(p=>p.giver===roomData.players.find(u=>u.id===user.uid).role);
                     if(!pending || selectedCards.length!==pending.count) return alert("เลือกไพ่ให้ครบ");
@@ -440,7 +427,6 @@
                     return;
                 }
 
-                // Playing
                 const myIdx = roomData.players.findIndex(p=>p.id===user.uid);
                 const myPlayer = roomData.players[myIdx];
                 const moves = getValidMoves(myPlayer.hand, roomData.centerPile, roomData.round===1);
@@ -543,7 +529,7 @@
                 }
             }, [roomData]);
 
-            // --- VIEW ---
+            // --- VIEW RENDER ---
             if(view==='LOGIN') return (
                 <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
                     <div className="bg-gray-800 p-8 rounded-2xl text-center max-w-md w-full border border-gray-700 shadow-2xl">
@@ -551,7 +537,6 @@
                         <input className="w-full bg-gray-700 p-3 rounded-lg text-center mb-4 text-white" placeholder="ใส่ชื่อเล่น..." value={playerName} onChange={e=>setPlayerName(e.target.value)} />
                         <div className="flex justify-center flex-wrap gap-2 mb-6">{AVATARS.map(a=><button key={a} onClick={()=>setAvatar(a)} className={`text-2xl p-2 rounded-full ${avatar===a?'bg-yellow-500':'bg-gray-700'}`}>{a}</button>)}</div>
                         <button onClick={()=>setView('LOBBY')} disabled={!user} className="w-full bg-yellow-500 text-black font-bold py-3 rounded-lg hover:bg-yellow-400 transition">{user?'เข้าสู่ล็อบบี้':'กำลังโหลด...'}</button>
-                        <button onClick={async()=>{await auth.signOut();location.reload()}} className="text-xs text-gray-500 mt-4 underline">รีเซ็ตตัวตนใหม่</button>
                     </div>
                 </div>
             );
@@ -561,11 +546,11 @@
                     <div className="w-full max-w-2xl bg-gray-800 rounded-2xl p-6 shadow-xl border border-gray-700">
                         <div className="flex justify-between items-center mb-8">
                             <div className="flex items-center gap-3"><span className="text-4xl">{avatar}</span><span className="text-2xl font-bold">{playerName}</span></div>
-                            <button onClick={()=>setSettingsOpen(true)} className="p-2 bg-gray-700 rounded-full"><IconSettings/></button>
+                            <button onClick={()=>setShowRules(true)} className="p-2 bg-gray-700 rounded-full"><IconBook/></button>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <button onClick={createRoom} disabled={isLoading} className="bg-indigo-600 p-8 rounded-xl flex flex-col items-center hover:bg-indigo-500 transition">
-                                {isLoading ? <IconLoader/> : <div className="text-center"><div className="text-4xl mb-2">🏠</div><div className="font-bold text-xl">สร้างห้อง</div></div>}
+                                {isLoading ? <IconLoader/> : <div className="text-center"><div className="text-4xl mb-2">🏠</div><div className="font-bold text-xl">สร้างห้อง</div><div className="text-xs opacity-75">(4-8 คน)</div></div>}
                             </button>
                             <div className="bg-gray-700 p-8 rounded-xl text-center">
                                 <div className="text-4xl mb-2">🚪</div>
@@ -574,7 +559,25 @@
                             </div>
                         </div>
                     </div>
-                    {settingsOpen && <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"><div className="bg-gray-800 p-6 rounded-xl w-80"><button onClick={()=>setSettingsOpen(false)} className="w-full bg-gray-600 py-2 rounded">ปิด</button></div></div>}
+                    {showRules && (
+                        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm p-4">
+                            <div className="bg-gray-800 p-6 rounded-xl w-full max-w-md border border-gray-600 modal-content">
+                                <h3 className="text-2xl font-bold mb-4 flex items-center gap-2 text-yellow-400"><IconBook/> กฎกติกา</h3>
+                                <div className="text-sm space-y-3 mb-6 text-gray-300">
+                                    <p><strong className="text-white">ลำดับไพ่:</strong> 2 ใหญ่สุด > A > K > ... > 3 เล็กสุด</p>
+                                    <p><strong className="text-white">ลำดับดอก:</strong> ♠ โพธิ์ดำ > ♥ แดง > ♦ ข้าวหลาม > ♣ จิก</p>
+                                    <p><strong className="text-white">การลงไพ่:</strong> ต้องลงไพ่ที่มีค่าสูงกว่าหรือดอกใหญ่กว่า (ในเลขเดียวกัน)</p>
+                                    <p><strong className="text-white">ตอง/โฟร์:</strong> ตองชนะ 1 ใบ, โฟร์ชนะ 2 ใบ</p>
+                                    <p><strong className="text-white">King Down:</strong> ถ้า King ไม่ชนะเป็นคนแรกในรอบถัดไป จะตกเป็น Slave ทันที</p>
+                                    <p><strong className="text-white">ย้อนศร:</strong> ถ้าผู้ชนะลงไพ่หมดมือแล้วไม่มีใครสู้ได้ ทิศทางการเล่นจะกลับด้าน</p>
+                                </div>
+                                <div className="border-t border-gray-600 pt-4 mb-4">
+                                    <label className="flex items-center justify-between text-sm"><span>เสียงประกอบ</span><input type="checkbox" checked={isSoundOn} onChange={e=>setIsSoundOn(e.target.checked)} className="toggle accent-green-500" /></label>
+                                </div>
+                                <button onClick={()=>setShowRules(false)} className="w-full bg-gray-600 py-3 rounded font-bold hover:bg-gray-500">ปิด</button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             );
 
@@ -671,7 +674,7 @@
                         <div className="glass-panel px-4 py-2 rounded-lg flex gap-2"><span className="text-gray-400">ROOM</span><span onClick={()=>{navigator.clipboard.writeText(roomData.code);alert("Copied")}} className="font-mono font-bold text-yellow-400 cursor-pointer">{roomData.code}</span></div>
                         <div className="flex gap-2">
                             {roomData.direction === -1 && <div className="glass-panel px-3 py-1 rounded-full text-xs flex items-center gap-1 text-red-300 animate-pulse"><IconRefresh className="w-4 h-4"/> REVERSE</div>}
-                            <button onClick={()=>setSettingsOpen(true)} className="glass-panel p-2 rounded-full"><IconSettings/></button>
+                            <button onClick={()=>setShowRules(true)} className="glass-panel p-2 rounded-full"><IconBook/></button>
                         </div>
                     </div>
 
@@ -766,15 +769,22 @@
                         </div>
                     </div>
 
-                    {settingsOpen && (
-                        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
-                            <div className="bg-gray-800 p-6 rounded-xl w-80 border border-gray-600">
-                                <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><IconSettings/> ตั้งค่า</h3>
-                                <div className="mb-6">
-                                    <label className="flex items-center justify-between mb-2"><span>เสียงประกอบ</span><input type="checkbox" checked={isSoundOn} onChange={e=>setIsSoundOn(e.target.checked)} className="toggle accent-green-500 h-5 w-5" /></label>
-                                    <input type="range" min="0" max="100" value={volume} onChange={e=>setVolume(e.target.value)} className="w-full accent-yellow-500" disabled={!isSoundOn} />
+                    {showRules && (
+                        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm p-4">
+                            <div className="bg-gray-800 p-6 rounded-xl w-full max-w-md border border-gray-600 modal-content">
+                                <h3 className="text-2xl font-bold mb-4 flex items-center gap-2 text-yellow-400"><IconBook/> กฎกติกา</h3>
+                                <div className="text-sm space-y-3 mb-6 text-gray-300">
+                                    <p><strong className="text-white">ลำดับไพ่:</strong> 2 ใหญ่สุด > A > K > ... > 3 เล็กสุด</p>
+                                    <p><strong className="text-white">ลำดับดอก:</strong> ♠ โพธิ์ดำ > ♥ แดง > ♦ ข้าวหลาม > ♣ จิก</p>
+                                    <p><strong className="text-white">การลงไพ่:</strong> ต้องลงไพ่ที่มีค่าสูงกว่าหรือดอกใหญ่กว่า (ในเลขเดียวกัน)</p>
+                                    <p><strong className="text-white">ตอง/โฟร์:</strong> ตองชนะ 1 ใบ, โฟร์ชนะ 2 ใบ</p>
+                                    <p><strong className="text-white">King Down:</strong> ถ้า King ไม่ชนะเป็นคนแรกในรอบถัดไป จะตกเป็น Slave ทันที</p>
+                                    <p><strong className="text-white">ย้อนศร:</strong> ถ้าผู้ชนะลงไพ่หมดมือแล้วไม่มีใครสู้ได้ ทิศทางการเล่นจะกลับด้าน</p>
                                 </div>
-                                <button onClick={()=>setSettingsOpen(false)} className="w-full bg-gray-600 py-2 rounded font-bold hover:bg-gray-500">ปิด</button>
+                                <div className="border-t border-gray-600 pt-4 mb-4">
+                                    <label className="flex items-center justify-between text-sm"><span>เสียงประกอบ</span><input type="checkbox" checked={isSoundOn} onChange={e=>setIsSoundOn(e.target.checked)} className="toggle accent-green-500" /></label>
+                                </div>
+                                <button onClick={()=>setShowRules(false)} className="w-full bg-gray-600 py-3 rounded font-bold hover:bg-gray-500">ปิด</button>
                             </div>
                         </div>
                     )}
